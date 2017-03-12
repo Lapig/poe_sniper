@@ -2,10 +2,17 @@
 
 A democratic PoE trade sniping tool using GNU Bash scripting.
 
+##Requirements
+A system able to run GNU Bash scripts.
+* Most Linux distros
+* macOS
+* Windows with the (Linux Subsystem)[https://msdn.microsoft.com/en-us/commandline/wsl/install_guide] installed.
+
 ##Installation
 * Extract the zip to a folder.
-* cd into the folder (i.e. `cd /mnt/c/Users/<username>/Documents/poe_sniper`)
-* install missing packages from your package manager (i.e. `sudo apt-get install beep`)
+* Launch your Bash shell.
+* Install missing packages from your package manager `sudo apt-get install beep`
+* `cd` into the folder `cd /mnt/c/Users/<username>/Documents/poe_sniper`
 * execute command `./poe_sniper args...`
 
 ##Usage
