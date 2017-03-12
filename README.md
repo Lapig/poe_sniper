@@ -6,7 +6,7 @@ A democratic PoE trade sniping tool using GNU Bash scripting.
 A system able to run GNU Bash scripts.
 * Most Linux distros
 * macOS
-* Windows with the (Linux Subsystem)[https://msdn.microsoft.com/en-us/commandline/wsl/install_guide] installed.
+* Windows with the [Linux Subsystem](https://msdn.microsoft.com/en-us/commandline/wsl/install_guide) installed.
 
 ##Installation
 * Extract the zip to a folder.
