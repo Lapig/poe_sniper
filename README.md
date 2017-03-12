@@ -5,6 +5,7 @@ A democratic PoE trade sniping tool using GNU Bash scripting.
 ##Installation
 * Extract the zip to a folder.
 * cd into the folder (i.e. `cd /mnt/c/Users/<username>/Documents/poe_sniper`)
+* install missing packages from your package manager (i.e. `sudo apt-get install beep`)
 * execute command `./poe_sniper args...`
 
 ##Usage
