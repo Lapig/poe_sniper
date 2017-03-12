@@ -9,7 +9,7 @@ parse_json () {
                 .stash as $tab | 
                 
                 .items[] | 
-                    select(.league | contains($league)) |
+                    select(.league==$league) |
                     select((.name | contains($itemstring)) 
                         or (.typeLine | contains($itemstring))) |
 
