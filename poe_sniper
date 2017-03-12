@@ -64,11 +64,11 @@ mkdir -p data/$dirname
 printf "Begin Indexing \tTime %s\n" $index_start_time
 
 # Live Indexing
-change_id=$(curl -s "http://api.poe.ninja/api/Data/GetStats" | ./jq -r '.nextChangeId')
+change_id=$(curl -s --compressed "http://api.poe.ninja/api/Data/GetStats" | ./jq -r '.nextChangeId')
 while true; do
     start_time=$(date +%s%N)
     newfile="data/$dirname/$change_id"
-    curl -s http://api.pathofexile.com/public-stash-tabs?id=$change_id -o $newfile # most recent change_id
+    curl -s --compressed http://api.pathofexile.com/public-stash-tabs?id=$change_id -o $newfile # most recent change_id
     change_id=$(cat data/$dirname/$change_id | ./jq -r '.next_change_id')
     end_time=$(date +%s%N)
     diff_time=$( echo "scale=6; ($end_time - $start_time)/1000000000" | bc )
@@ -81,7 +81,7 @@ while true; do
 
     # parse_stashes item league currency_quantity currency_type
     # runs process in background so we can look up the next change_id
-    parse_stashes "$1" "$2" "$3" "$4" $newfile  &
+    # parse_stashes "$1" "$2" "$3" "$4" $newfile  &
 
     sleep_time=0
     if [ $(bc <<< "$diff_time<1") = 1 ]; then
