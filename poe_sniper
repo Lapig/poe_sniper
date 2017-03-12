@@ -60,7 +60,7 @@ parse_stashes () {
 index_start_time=$(date +"%H-%M-%S")
 dirname=$index_start_time
 rm -rf data/$dirname
-mkdir data/$dirname
+mkdir -R data/$dirname
 printf "Begin Indexing \tTime %s\n" $index_start_time
 
 # Live Indexing
