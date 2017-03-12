@@ -21,9 +21,9 @@ Will look for any item name or type containing the string 'Jewel' in any league 
 
 Example 2:
 ```
-./poe_sniper 'Ancient Rel' 'Hardcore Stand' 5 chaos
+./poe_sniper 'Ancient Rel' 'Hardcore Standard' 5 chaos
 ```
-Will look for any item name or type containing the string 'Ancient Rel' in the league containing 'Hardcore Stand' that is under 5 chaos orbs in price.
+Will look for any item name or type containing the string 'Ancient Rel' in the league matching 'Hardcore Standard' that is under 5 chaos orbs in price.
 
 ###Uses
 
