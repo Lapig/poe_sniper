@@ -2,6 +2,11 @@
 
 A democratic PoE trade sniping tool using GNU Bash scripting.
 
+##Installation
+* Extract the zip to a folder.
+* cd into the folder (i.e. `cd /mnt/c/Users/<username>/Documents/poe_sniper`)
+* execute command `./poe_sniper args...`
+
 ##Usage
 ```
 ./poe_sniper <item> <league> <(optional)max currency quantity> <(optional)currency type>
