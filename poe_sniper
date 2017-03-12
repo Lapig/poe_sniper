@@ -1,0 +1,81 @@
+#!/bin/bash
+
+parse_json () {
+    items=$(./jq -rc --arg itemstring "$1" --arg league "$2" '
+            .stashes[] | 
+                .lastCharacterName as $charname | 
+                .stash as $tab | 
+                
+                .items[] | 
+                    select(.league | contains($league)) |
+                    select((.name | contains($itemstring)) 
+                        or (.typeLine | contains($itemstring))) |
+
+            {charname: $charname, tab: $tab, league: .league, note: .note, item_name: .name, x: .x, y: .y} |
+            "\(.charname)\t\(.note)\t\(.tab)\t\(.league)\t\(.item_name)\t\(.x)\t\(.y)"' $3)
+
+    printf "%s\n" "$items"
+}
+
+parse_stashes () {
+    IFS=''
+    parse_json "$1" "$2" "$5" |
+    while read -r line
+    do
+        item=$( printf "%s" "$line" | awk -F"\t" '{print $5}' | sed -e 's/<.*>//')
+        [ -z $item ] && continue
+        charname=$( printf "%s" "$line" | awk -F"\t" '{print $1}' )
+        league=$( printf "%s" "$line" | awk -F"\t" '{print $4}' )
+        tab=$( printf "%s" "$line" | awk -F"\t" '{print $3}' )
+        x=$( printf "%s" "$line" | awk -F"\t" '{print $6}' )
+        y=$( printf "%s" "$line" | awk -F"\t" '{print $7}' )
+
+        price=$( printf "%s" "$line" | awk -F"\t" '{print $2}' )
+        pricen=$( printf "%s" "$price" | awk -F" " '{print $1}' )
+        priceq=$( printf "%s" "$price" | awk -F" " '{print $2}' )
+        pricet=$( printf "%s" "$price" | awk -F" " '{print $3}' )        
+
+        if [ "$price" = "null" ] && [[ ($tab == *"~b/o"*) || ($tab == *"~price"*) ]]; then
+            priceq=$( printf "%s" "$tab" | awk -F" " '{print $2}' )
+            pricet=$( printf "%s" "$tab" | awk -F" " '{print $3}' )
+        fi        
+
+        [ "$price" = "null" ] || [ -z $line ] && continue
+        [ ! -z $3 ] && [ "$pricet" = "$4" ] && [ $(bc <<< "$priceq>$3") = 1 ] && continue
+
+        pricestring=$( printf "%5s - %5s" $priceq $pricet)
+        whisper=$( printf "@%s I'd like to buy your %s listed for %s %s in %s; tab:%s @ {%sx, %sy}." $charname $item $priceq $pricet $league $tab $x $y)
+        printf "%30s\t\t\t%s\n" $pricestring $whisper 
+        beep 2>/dev/null
+    done
+}
+
+index_start_time=$(date +"%H-%M-%S")
+dirname=$index_start_time
+rm -rf data/$dirname
+mkdir data/$dirname
+printf "Begin Indexing \tTime %s\n" $index_start_time
+
+change_id=$(curl -s "http://api.poe.ninja/api/Data/GetStats" | ./jq -r '.nextChangeId')
+while true; do
+    start_time=$(date +%s%N)
+    newfile="data/$dirname/$change_id"
+    curl -s http://api.pathofexile.com/public-stash-tabs?id=$change_id -o $newfile
+    change_id=$(cat data/$dirname/$change_id | ./jq -r '.next_change_id')
+    end_time=$(date +%s%N)
+    diff_time=$( echo "scale=6; ($end_time - $start_time)/1000000000" | bc )
+
+    if [ "$change_id" = "null" ] || [ -z $change_id ]; then
+        index_end_time=$(date +"%H-%M-%S")
+        printf "\nEnd Indexing \tTime %s\n" $index_end_time
+        break
+    fi
+
+    parse_stashes "$1" "$2" "$3" "$4" $newfile  &
+
+    sleep_time=0
+    if [ $(bc <<< "$diff_time<1") = 1 ]; then
+        sleep_time=$( echo "scale=6; (1 - $diff_time)" | bc )
+        sleep "$sleep_time"
+    fi
+done
