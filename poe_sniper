@@ -3,7 +3,7 @@
 # parse_json item league json_obj
 # uses jq - https://stedolan.github.io/jq/manual/
 parse_json () {
-    items=$(./jq -rc --arg itemstring "$1" --arg league "$2" '
+    items=$(jq -rc --arg itemstring "$1" --arg league "$2" '
             .stashes[] | 
                 .lastCharacterName as $charname | 
                 .stash as $tab | 
@@ -56,7 +56,7 @@ parse_stashes () {
         pricestring=$( printf "%5s - %5s" $priceq $pricet)
         whisper=$( printf "@%s I'd like to buy your %s listed for %s %s in %s; tab:%s @ {%sx, %sy}." $charname $item $priceq $pricet $league $tab $x $y)
         printf "%30s\t\t\t%s\n" $pricestring $whisper 
-        beep 2>/dev/null # audio alert
+        #beep 2>/dev/null # audio alert
     done
 }
 
@@ -67,12 +67,12 @@ mkdir -p data/$dirname
 printf "Begin Indexing \tTime %s\n" $index_start_time
 
 # Live Indexing
-change_id=$(curl -s --compressed "http://api.poe.ninja/api/Data/GetStats" | ./jq -r '.nextChangeId')
+change_id=$(curl -s --compressed "http://api.poe.ninja/api/Data/GetStats" | jq -r '.nextChangeId')
 while true; do
     start_time=$(date +%s%N)
     newfile="data/$dirname/$change_id"
     curl -s --compressed http://api.pathofexile.com/public-stash-tabs?id=$change_id -o $newfile # most recent change_id
-    change_id=$(cat data/$dirname/$change_id | ./jq -r '.next_change_id')
+    change_id=$(cat data/$dirname/$change_id | jq -r '.next_change_id')
     end_time=$(date +%s%N)
     diff_time=$( echo "scale=6; ($end_time - $start_time)/1000000000" | bc )
 
@@ -86,7 +86,7 @@ while true; do
     # runs process in background so we can look up the next change_id
     parse_stashes "$1" "$2" "$3" "$4" $newfile  &
 
-    sleep_time=0
+    sleep_time=500
     if [ $(bc <<< "$diff_time<1") = 1 ]; then
         sleep_time=$( echo "scale=6; (1 - $diff_time)" | bc )
         sleep "$sleep_time"
