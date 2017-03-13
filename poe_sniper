@@ -81,7 +81,7 @@ while true; do
 
     # parse_stashes item league currency_quantity currency_type
     # runs process in background so we can look up the next change_id
-    # parse_stashes "$1" "$2" "$3" "$4" $newfile  &
+    parse_stashes "$1" "$2" "$3" "$4" $newfile  &
 
     sleep_time=0
     if [ $(bc <<< "$diff_time<1") = 1 ]; then
