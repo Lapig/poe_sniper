@@ -22,9 +22,9 @@ A system able to run GNU Bash scripts.
 
 Example 1:
 ```
-./poe_sniper 'Jewel' 
+./poe_sniper 'Jewel' 'Standard'
 ```
-Will look for any item name or type containing the string 'Jewel' in any league at any price.
+Will look for any item name or type containing the string 'Jewel' in Standard at any price.
 
 Example 2:
 ```
