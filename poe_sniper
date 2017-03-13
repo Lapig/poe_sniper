@@ -13,8 +13,8 @@ parse_json () {
                     select((.name | contains($itemstring)) 
                         or (.typeLine | contains($itemstring))) |
 
-            {charname: $charname, tab: $tab, league: .league, note: .note, item_name: .name, x: .x, y: .y} |
-            "\(.charname)\t\(.note)\t\(.tab)\t\(.league)\t\(.item_name)\t\(.x)\t\(.y)"' $3)
+            {charname: $charname, tab: $tab, league: .league, note: .note, item_name: .name, item_type: .typeLine, x: .x, y: .y} |
+            "\(.charname)\t\(.note)\t\(.tab)\t\(.league)\t\(.item_name)\t\(.item_type)\t\(.x)\t\(.y)"' $3)
 
     printf "%s\n" "$items"
 }
@@ -28,12 +28,15 @@ parse_stashes () {
     while read -r line
     do
         item=$( printf "%s" "$line" | awk -F"\t" '{print $5}' | sed -e 's/<.*>//')
+        if [ -z $item ]; then
+            item=$( printf "%s" "$line" | awk -F"\t" '{print $6}')
+        fi
         [ -z $item ] && continue
         charname=$( printf "%s" "$line" | awk -F"\t" '{print $1}' )
         league=$( printf "%s" "$line" | awk -F"\t" '{print $4}' )
         tab=$( printf "%s" "$line" | awk -F"\t" '{print $3}' )
-        x=$( printf "%s" "$line" | awk -F"\t" '{print $6}' )
-        y=$( printf "%s" "$line" | awk -F"\t" '{print $7}' )
+        x=$( printf "%s" "$line" | awk -F"\t" '{print $7}' )
+        y=$( printf "%s" "$line" | awk -F"\t" '{print $8}' )
 
         price=$( printf "%s" "$line" | awk -F"\t" '{print $2}' )
         priceq=$( printf "%s" "$price" | awk -F" " '{print $2}' ) # price's quantity
