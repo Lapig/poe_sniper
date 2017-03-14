@@ -53,9 +53,10 @@ parse_stashes () {
         [ ! -z $3 ] && [ "$pricet" = "$4" ] && [ $(bc <<< "$priceq>$3") = 1 ] && continue
 
         # Found
+	timestamp=$(date +%r)
         pricestring=$( printf "%5s - %5s" $priceq $pricet)
-        whisper=$( printf "@%s I'd like to buy your %s listed for %s %s in %s; tab:%s @ {%sx, %sy}." $charname $item $priceq $pricet $league $tab $x $y)
-        printf "%30s\t\t\t%s\n" $pricestring $whisper 
+        whisper=$( printf "@%s I'd like to buy your %s listed for %s %s in %s; tab:%s" $charname $item $priceq $pricet $league $tab )
+        printf "%s %s %s\n" $timestamp $pricestring $whisper 
         #beep 2>/dev/null # audio alert
     done
 }
@@ -86,7 +87,7 @@ while true; do
     # runs process in background so we can look up the next change_id
     parse_stashes "$1" "$2" "$3" "$4" $newfile  &
 
-    sleep_time=500
+    sleep_time=100
     if [ $(bc <<< "$diff_time<1") = 1 ]; then
         sleep_time=$( echo "scale=6; (1 - $diff_time)" | bc )
         sleep "$sleep_time"
