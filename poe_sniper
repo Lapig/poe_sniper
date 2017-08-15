@@ -4,13 +4,13 @@
 # uses jq - https://stedolan.github.io/jq/manual/
 parse_json () {
     items=$(jq -rc --arg itemstring "$1" --arg league "$2" '
-            .stashes[] | 
-                .lastCharacterName as $charname | 
-                .stash as $tab | 
-                
-                .items[] | 
+            .stashes[] |
+                .lastCharacterName as $charname |
+                .stash as $tab |
+
+                .items[] |
                     select(.league==$league) |
-                    select((.name | contains($itemstring)) 
+                    select((.name | contains($itemstring))
                         or (.typeLine | contains($itemstring))) |
 
             {charname: $charname, tab: $tab, league: .league, note: .note, item_name: .name, item_type: .typeLine, x: .x, y: .y} |
@@ -24,7 +24,7 @@ parse_stashes () {
     IFS=''
 
     # parse_json item league json_obj
-    parse_json "$1" "$2" "$5" |    
+    parse_json "$1" "$2" "$5" |
     while read -r line
     do
         item=$( printf "%s" "$line" | awk -F"\t" '{print $5}' | sed -e 's/<.*>//')
@@ -40,15 +40,15 @@ parse_stashes () {
 
         price=$( printf "%s" "$line" | awk -F"\t" '{print $2}' )
         priceq=$( printf "%s" "$price" | awk -F" " '{print $2}' ) # price's quantity
-        pricet=$( printf "%s" "$price" | awk -F" " '{print $3}' )  # price's type       
+        pricet=$( printf "%s" "$price" | awk -F" " '{print $3}' )  # price's type
 
         if [ "$price" = "null" ] && [[ ($tab == *"~b/o"*) || ($tab == *"~price"*) ]]; then
             priceq=$( printf "%s" "$tab" | awk -F" " '{print $2}' )
             pricet=$( printf "%s" "$tab" | awk -F" " '{print $3}' )
-        fi        
+        fi
 
         [ "$price" = "null" ] || [ -z $line ] && continue
-        
+
         # price must be less than currency_quantity
         [ ! -z $3 ] && [ "$pricet" = "$4" ] && [ $(bc <<< "$priceq>$3") = 1 ] && continue
 
@@ -56,7 +56,7 @@ parse_stashes () {
 	timestamp=$(date +%r)
         pricestring=$( printf "%5s - %5s" $priceq $pricet)
         whisper=$( printf "@%s I'd like to buy your %s listed for %s %s in %s; tab:%s" $charname $item $priceq $pricet $league $tab )
-        printf "%s %s %s\n" $timestamp $pricestring $whisper 
+        printf "%s %s %s\n" $timestamp $pricestring $whisper
         #beep 2>/dev/null # audio alert
     done
 }
